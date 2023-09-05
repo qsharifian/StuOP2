@@ -1,0 +1,176 @@
+import heapq
+from datetime import date
+start_date = date
+year = start_date.year
+month = start_date.month
+day = start_date.day
+graduated_students=[]
+active_students=[]
+x = []
+y = []
+
+from pickle import load
+try:
+    with open ("active_students.info","rb") as active_students:
+        students=load(active_students)
+    with open ("graduated_student.info","rb") as graduated_student:
+        graduated_students=load(graduated_student)
+except:
+    students=[]
+
+def check_code_melli(code_melli):
+    for student in students:
+        if student["code_melli"]==code_melli or len(code_melli)!=10:
+            return False 
+        return True
+
+def check_student_code(student_code):
+    for student in students:
+        if student["student_code"]==student_code or len(student_code)!=6:
+            return False 
+        return True
+
+def add_student():
+    global student
+    student={}
+    student['first_name']=input('Enter the first name of the student:')
+    student['last_name']=input('Enter the last name of the student:')
+    student['birthday']=input('Enter the birthday of the student(yyyy/mm/dd):')
+    student['code_melli']=(input('Enter the code_melli of the student in 10 digits:'))
+    if check_code_melli(student["code_melli"])==False:
+        input("This code is already taken")
+        return False
+    student['student_code']=(input('Enter the student code in 6 digits:'))
+    if check_student_code(student["student_code"])==False:
+        input("This code is already taken")
+        return False
+    #x = input('wanna add cor?y/n')
+    x = []
+    y = []
+    while True:
+        x.append(input('Enter student courses:'))
+        y.append(input('Enter student grades:'))
+        print('Do want to add another? y/n')
+        if input() == 'n':
+            break
+    student['courses']=(x)
+    student['grades']=(y)
+    grades = [grade for student in students for grade in student['grades']]
+    average = sum(grades)/len(grades)
+    smallest = min(grades)
+    greatest = max(grades)
+    print("Average grade:", average)
+    print("Smallest grade:", smallest)
+    print("Greatest grade:", greatest)
+    students.append(student)
+    input("\n\nThe student got added to the list\nPress any key...")
+
+def change_courses():
+    student_code=input('Enter student_code:')
+    for student in students:
+        if student ["student_code"]==student_code:
+            print(f"first name of the student:{student['first_name']}")
+            print(f"last name of the student:{student['last_name']}")
+            print(f"code melli of the student:{student['code_melli']}")
+            print(f"student code of the studet:{student['student_code']}")
+            print("what you want to do? d = delete a course and grade's | c for change a grade | a for add a course and grade")
+            z = input()
+            if z == "d":
+                x1=list(student['courses'])
+                y1=list(student['grades'])
+                print(f"student courses is : {student['courses']}")
+                print('enter the course number')
+                l = int(input())
+                l = (l-1)
+                x1.pop(l)
+                y1.pop(l)
+                student['courses']=(x1)
+                student['grades']=(y1)
+                print('removed')
+            elif z == 'c':
+                x2=list(student['courses'])
+                y2=list(student['grades'])
+                print(x2)
+                print(y2)
+                print('enter the course number')
+                l1 = int(input())
+                l1 = (l1 -1)
+                y2.pop(l1)
+                print('what is the grades?')
+                y2.insert(l1,input())
+                student['courses']=(x2)
+                student['grades']=(y2)
+                print(x2)
+                print(y2)
+                print('done')
+            elif z == 'a':
+                print('enter the courses name')
+                x4 = input()
+                print('enter the grades')
+                y4 = input()
+                x3=list(student['courses'])
+                y3=list(student['grades'])
+                x3.append(x4)
+                y3.append(y4)
+                student['courses']=(x3)
+                student['grades']=(y3)
+                print('done')
+
+def find_student():
+    student_code=input('Enter student_code:')
+    for student in students:
+        if student ["student_code"]==student_code:
+            print(f"first name of the student:{student['first_name']}")
+            print(f"last name of the student:{student['last_name']}")
+            print(f"birthday of the student:{student['birthday']}")
+            print(f"code melli of the student:{student['code_melli']}")
+            print(f"student code of the studet:{student['student_code']}")
+            print(f"courses for student:{student['courses']}and{student['grades']}")
+            break
+    else:
+        input("\n\nThis student is not found!Try Again...")
+
+def delete_student():
+    #while True:
+    choice=input('Do you want to add the student in graduated students list? (y/n):')
+    if choice=='y':
+        student_code=input("Enter student code to delete student data:")
+        for student in students:
+            if student["student_code"]==student_code:
+                graduated_students.append(student)
+                students.remove(student)
+                print("The student has been moved successfully")
+            else:
+                input("This student IS NOT in students database!")
+    else:
+        student_code=input("Enter student code to delete student data:")
+        for student in students:
+            if student["student_code"]==student_code:
+                students.remove(student)
+                print("The student has been deleted successfully")
+
+def g_student():
+    print(graduated_students)
+
+def list_students():
+    for student in students:
+        print(f"first name of the student:{student['first_name']}")
+        print(f"last name of the student:{student['last_name']}")
+        print(f"birthday of the student:{student['birthday']}")
+        print(f"code melli of the student:{student['code_melli']}")
+        print(f"student code of the student:{student['student_code']}")
+        print(f"courses for the student:{student['courses']}")
+        print(f"grades of the student:{student['grades']}")
+        print('------------------------')
+    input('\n\nEnter any key')
+
+def save_students():
+    from pickle import dump
+    try:
+        with open ("active_students.info","wb") as active_students:
+            dump(students,active_students)
+        with open ("graduated_student.info","wb") as graduated_student:
+            dump(graduated_students,graduated_student)  
+            input("The Information Of The Student Have Been Successfully Saved")
+    except(PermissionError):
+        input("You cannot save database in this location,try another location")
